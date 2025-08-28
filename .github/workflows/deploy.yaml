@@ -37,8 +37,8 @@ jobs:
               working-directory: ./terraform
 
             - name: Terraform Format Check
-              run: terraform fmt -chec
-              working-directory: ./terraformk
+              run: terraform fmt -check
+              working-directory: ./terraform
 
             - name: Terraform Init
               run: terraform init
