@@ -67,12 +67,12 @@ EOT
       priority = 1
     }
   }
-  lambda_config {
-    custom_message                 = aws_lambda_function.custom_message.arn
-    create_auth_challenge          = aws_lambda_function.create_custom_auth.arn
-    define_auth_challenge          = aws_lambda_function.define_custom_auth.arn
-    verify_auth_challenge_response = aws_lambda_function.verify_custom_auth.arn
-  }
+  # lambda_config {
+  #   custom_message                 = aws_lambda_function.custom_message.arn
+  #   create_auth_challenge          = aws_lambda_function.create_custom_auth.arn
+  #   define_auth_challenge          = aws_lambda_function.define_custom_auth.arn
+  #   verify_auth_challenge_response = aws_lambda_function.verify_custom_auth.arn
+  # }
   sms_configuration {
     external_id    = var.IAM_COGNITO_ASSUMABLE_ROLE_EXTERNAL_ID
     sns_caller_arn = aws_iam_role.cognito_sms_role.arn

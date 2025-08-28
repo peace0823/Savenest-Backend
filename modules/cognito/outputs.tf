@@ -1,11 +1,11 @@
 output "COGNITO_USER_POOL_ARN" {
   description = "ARN of the Cognito User Pool"
-  value       = aws_cognito_user_pool.congito_end_user_userpool.arn
+  value       = aws_cognito_user_pool.cognito_end_user_userpool.arn
 }
 
 output "COGNITO_USER_POOL_ID" {
   description = "ID of the Cognito User Pool"
-  value       = aws_cognito_user_pool.congito_end_user_userpool.id
+  value       = aws_cognito_user_pool.cognito_end_user_userpool.id
 }
 
 output "COGNITO_USER_CLIENT_SECRET_A" {
