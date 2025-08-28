@@ -34,18 +34,24 @@ jobs:
 
             - name: Format Terraform Files (recursive)
               run: terraform fmt -recursive
+              working-directory: ./infra/terraform
 
             - name: Terraform Format Check
-              run: terraform fmt -check
+              run: terraform fmt -chec
+              working-directory: ./infra/terraformk
 
             - name: Terraform Init
               run: terraform init
+              working-directory: ./infra/terraform
 
             - name: Terraform Validate
               run: terraform validate -no-color
+              working-directory: ./infra/terraform
 
             - name: Terraform Plan
               run: terraform plan -no-color  -out=tfplan
+              working-directory: ./infra/terraform
 
             - name: Terraform Apply
               run: terraform apply -auto-approve tfplan
+              working-directory: ./infra/terraform
