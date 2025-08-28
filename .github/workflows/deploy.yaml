@@ -2,7 +2,7 @@ name: deploy resources to AWS
 
 on:
     push:
-        branches: orireb
+        branches: main
     # pull_request:
     #     branches: main
 jobs:
