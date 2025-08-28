@@ -1,10 +1,10 @@
 #creates the userpool
-resource "aws_cognito_user_pool" "congito_end_user_userpool" {
+resource "aws_cognito_user_pool" "cognito_end_user_userpool" {
   name                       = "${var.RESOURCE_PREFIX}-userpool"
   alias_attributes           = ["preferred_username"]
   auto_verified_attributes   = ["email"]
   mfa_configuration          = "OPTIONAL"
-  sms_authentication_message = "savenest ${var.RESOURCE_PREFIX} verification code is {####}"
+  sms_authentication_message = "Your ${var.RESOURCE_PREFIX} authentication code is {####}"
 
   password_policy {
     minimum_length                   = 8
@@ -58,7 +58,7 @@ Please log in and change your password immediately.
 Savenest Team
 EOT
       email_subject = "Your temporary password"
-      sms_message = "Hi {username}, your temporary password for Savenest FinanceApp is {####}"
+      sms_message   = "Hi {username}, your temporary password for Savenest FinanceApp is {####}"
     }
   }
   account_recovery_setting {
@@ -143,16 +143,16 @@ EOT
 # creates user pool domain link 
 resource "aws_cognito_user_pool_domain" "main" {
   domain       = "${var.RESOURCE_PREFIX}-112233"
-  user_pool_id = aws_cognito_user_pool.congito_end_user_userpool.id
+  user_pool_id = aws_cognito_user_pool.cognito_end_user_userpool.id
 }
 
 # creates the app client
 resource "aws_cognito_user_pool_client" "cognito_client_end_user" {
   name            = "${var.RESOURCE_PREFIX}-app-client-end-user"
-  user_pool_id    = aws_cognito_user_pool.congito_end_user_userpool.id
+  user_pool_id    = aws_cognito_user_pool.cognito_end_user_userpool.id
   generate_secret = false
 
-  allowed_oauth_flows                  = ["implicit"]
+  allowed_oauth_flows                  = ["code"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["phone", "email", "openid", "profile", "aws.cognito.signin.user.admin"]
 
@@ -164,6 +164,7 @@ resource "aws_cognito_user_pool_client" "cognito_client_end_user" {
   ]
 
   callback_urls                = ["https://${var.WEBAPP_DNS}"]
+  logout_urls                  = ["https://${var.WEBAPP_DNS}/logout"]
   supported_identity_providers = ["COGNITO"]
   access_token_validity        = 1440
   refresh_token_validity       = 365
@@ -175,27 +176,26 @@ resource "aws_cognito_user_pool_client" "cognito_client_end_user" {
   }
 
   depends_on = [
-    aws_cognito_user_pool.congito_end_user_userpool
+    aws_cognito_user_pool.cognito_end_user_userpool
   ]
 }
 
 
 resource "aws_iam_policy" "sms_policy" {
-  name   = "${var.ENV}-savenest-${var.RESOURCE_PREFIX}-sms_policy-core"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-          "sns:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
-}
-EOF
+  name = "${var.ENV}-savenest-${var.RESOURCE_PREFIX}-sms_policy-core"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "sns:Publish"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role" "cognito_sms_role" {
@@ -254,7 +254,7 @@ EOF
 resource "aws_cognito_user_group" "cognito-user-groups" {
   description  = "user group managed by cloud@m4ace.com with terraform"
   name         = var.COGNITO_GROUP_LIST
-  user_pool_id = aws_cognito_user_pool.congito_end_user_userpool.id
+  user_pool_id = aws_cognito_user_pool.cognito_end_user_userpool.id
 }
 
 
@@ -302,7 +302,7 @@ resource "aws_lambda_permission" "customSignUpMessage" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.custom_message.function_name
   principal     = "cognito-idp.amazonaws.com"
-  source_arn    = aws_cognito_user_pool.congito_end_user_userpool.arn
+  source_arn    = aws_cognito_user_pool.cognito_end_user_userpool.arn
   depends_on    = [aws_lambda_function.custom_message]
 
 
@@ -389,7 +389,7 @@ resource "aws_lambda_permission" "defineCustomAuth" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.define_custom_auth.function_name
   principal     = "cognito-idp.amazonaws.com"
-  source_arn    = aws_cognito_user_pool.congito_end_user_userpool.arn
+  source_arn    = aws_cognito_user_pool.cognito_end_user_userpool.arn
   depends_on    = [aws_lambda_function.define_custom_auth]
 
 
@@ -466,7 +466,7 @@ resource "aws_lambda_permission" "createCustomAuth" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.create_custom_auth.function_name
   principal     = "cognito-idp.amazonaws.com"
-  source_arn    = aws_cognito_user_pool.congito_end_user_userpool.arn
+  source_arn    = aws_cognito_user_pool.cognito_end_user_userpool.arn
   depends_on    = [aws_lambda_function.create_custom_auth]
 
 
@@ -542,7 +542,7 @@ resource "aws_lambda_permission" "verifyCustomAuth" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.verify_custom_auth.function_name
   principal     = "cognito-idp.amazonaws.com"
-  source_arn    = aws_cognito_user_pool.congito_end_user_userpool.arn
+  source_arn    = aws_cognito_user_pool.cognito_end_user_userpool.arn
   depends_on    = [aws_lambda_function.verify_custom_auth]
 
 
