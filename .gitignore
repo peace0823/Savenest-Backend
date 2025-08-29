@@ -38,3 +38,9 @@ terraform.rc
 
 # Windows thumbnail cache
 Thumbs.db
+
+# dotenv 
+*.env
+
+# node_modules
+node_modules/
